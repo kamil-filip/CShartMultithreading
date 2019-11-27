@@ -55,12 +55,12 @@ namespace MasteringConcurrency
             {
                 for (int i = 0; i < iterations; i++)
                 {
-                    lock (lockFlag)
-                        counter++;
+                    //lock (lockFlag)
+                    counter++;
 
                     Thread.SpinWait(100);
-                    lock (lockFlag)
-                        counter--;
+                    //lock (lockFlag)
+                    counter--;
 
                 }
             };
@@ -76,54 +76,54 @@ namespace MasteringConcurrency
 
             Console.WriteLine(counter);
         }
-    }
 
-    static void Sample3(string[] args)
-    {
-        var arg = 0;
-        var result = "";
-        var counter = 0;
-        var lockHandle = new object();
-
-        var calcThread = new Thread(() =>
+        static void Sample4()
         {
-            while (true)
+            var arg = 0;
+            var result = "";
+            var counter = 0;
+            var lockHandle = new object();
+
+            var calcThread = new Thread(() =>
             {
-                lock (lockHandle)
+                while (true)
                 {
-                    counter++;
-                    result = arg.ToString();
-                    Thread.Sleep(4000);
+                    lock (lockHandle)
+                    {
+                        counter++;
+                        result = arg.ToString();
+                        Thread.Sleep(4000);
 
-                    Monitor.Pulse(lockHandle);
-                    Monitor.Wait(lockHandle);
+                        Monitor.Pulse(lockHandle);
+                        Monitor.Wait(lockHandle);
 
+                    }
                 }
+
+            })
+            {
+                IsBackground = true
+            };
+
+            lock (lockHandle)
+            {
+                calcThread.Start();
+                Thread.Sleep(100);
+                Console.WriteLine($"counter = {counter}, result = {result}");
+
+
+                arg = 123;
+                Monitor.Pulse(lockHandle);
+                Monitor.Wait(lockHandle);
+                Console.WriteLine($"counter = {counter}, result = {result}");
+
+                arg = 321;
+                Monitor.Pulse(lockHandle);
+                Monitor.Wait(lockHandle);
+                Console.WriteLine($"counter = {counter}, result = {result}");
             }
 
-        })
-        {
-            IsBackground = true
-        };
-
-        lock (lockHandle)
-        {
-            calcThread.Start();
-            Thread.Sleep(100);
-            Console.WriteLine($"counter = {counter}, result = {result}");
-
-
-            arg = 123;
-            Monitor.Pulse(lockHandle);
-            Monitor.Wait(lockHandle);
-            Console.WriteLine($"counter = {counter}, result = {result}");
-
-            arg = 321;
-            Monitor.Pulse(lockHandle);
-            Monitor.Wait(lockHandle);
-            Console.WriteLine($"counter = {counter}, result = {result}");
         }
 
     }
-
 }
