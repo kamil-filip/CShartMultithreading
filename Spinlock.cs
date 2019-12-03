@@ -6,11 +6,11 @@ using System.Threading;
 
 namespace MasteringConcurrency
 {
-    class Program
+    class SpinLock
     {
         private const int _count = 10000000;
-    
-        static void Main(string[] args)
+
+        static void Main4(string[] args)
         {
             var map = new Dictionary<double, double>();
             var r = Math.Sin(0.01);
@@ -19,9 +19,9 @@ namespace MasteringConcurrency
             var prm = 0d;
             var lockFlag = new object();
             var sw = Stopwatch.StartNew();
-            for(int i =0; i <_count; i++)
+            for (int i = 0; i < _count; i++)
             {
-                lock(lockFlag)
+                lock (lockFlag)
                 {
                     map.Add(prm, Math.Sin(prm));
                     prm += 0.01;
@@ -37,7 +37,7 @@ namespace MasteringConcurrency
             prm = 0;
             sw = Stopwatch.StartNew();
 
-            for(int i =0; i <_count; i++)
+            for (int i = 0; i < _count; i++)
             {
                 var gotLock = false;
                 try
@@ -57,8 +57,8 @@ namespace MasteringConcurrency
             Console.WriteLine($"Spinlock with memory barrier: {sw.ElapsedMilliseconds} ms");
 
 
-           //spinlock without memory barrier
-            map.Clear();            
+            //spinlock without memory barrier
+            map.Clear();
             prm = 0;
             sw = Stopwatch.StartNew();
 
@@ -86,3 +86,4 @@ namespace MasteringConcurrency
         }
     }
 }
+
